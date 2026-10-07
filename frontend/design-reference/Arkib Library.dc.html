@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#DEE0E4;}
+body{font-family:'Geist',system-ui,sans-serif;color:#15171C;-webkit-font-smoothing:antialiased;}
+a{color:#1F6FE5;text-decoration:none;} a:hover{color:#0B4FC2;}
+input::placeholder,textarea::placeholder{color:#8A8F99;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+</helmet>
+
+<div style="height:100vh;display:flex;flex-direction:column;background:radial-gradient(110% 80% at 50% 0%,#E9EAED 0%,#DEE0E4 55%,#D3D6DB 100%);overflow:hidden;">
+
+  <header style="display:flex;align-items:center;gap:24px;padding:14px 20px;border-bottom:1px solid rgba(21,23,28,.12);flex-shrink:0;">
+    <a href="Arkib Landing.dc.html" style="display:flex;align-items:center;gap:14px;color:#15171C;">
+      <span style="font-weight:600;font-size:20px;letter-spacing:-.02em;">ARKIB</span>
+      <span style="font-size:9px;line-height:1.3;color:#3A3E46;text-transform:uppercase;letter-spacing:.02em;">Agency<br>library</span>
+    </a>
+    <div style="flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.95);border-radius:999px;padding:9px 16px;">
+      <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#8A8F99;">⌕</span>
+      <input value="{{ filter }}" onChange="{{ onFilter }}" placeholder="Filter by name or reference" style="flex:1;min-width:0;border:0;background:transparent;outline:none;font:inherit;font-size:13px;color:#15171C;"></input>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:18px;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
+      <button onClick="{{ toggleAssistant }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#15171C;cursor:pointer;" style-hover="color:#1F6FE5;">{{ assistantToggleLabel }}</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:30px;height:30px;border-radius:50%;background:#C9D6EA;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0B2A5C;">NA</span>
+        <span style="line-height:1.3;">Nur Aisyah<br><span style="color:#5A5F69;font-weight:500;">Policy Office</span></span>
+      </div>
+      <a href="Arkib Landing.dc.html" style="color:#15171C;" style-hover="color:#1F6FE5;">[ Sign out ]</a>
+    </div>
+  </header>
+
+      <input ref="{{ fileInputRef }}" type="file" multiple="multiple" onChange="{{ onFileInput }}" style="display:none;"></input>
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:{{ gridCols }};gap:12px;padding:12px;">
+
+    <sc-if value="{{ showTree }}" hint-placeholder-val="{{ true }}"><aside style="min-height:0;display:flex;flex-direction:column;gap:14px;padding:6px 4px;overflow:auto;">
+      <div style="display:flex;gap:8px;">
+        <button onClick="{{ pickFiles }}" style="flex:1;border:0;border-radius:999px;background:#1F6FE5;color:#fff;padding:11px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;" style-hover="background:#0B4FC2;">↑ Upload</button>
+        <button onClick="{{ openNewFolder }}" style="flex:1;border:1px solid rgba(21,23,28,.3);background:transparent;border-radius:999px;padding:11px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#15171C;cursor:pointer;" style-hover="border-color:#1F6FE5;color:#1F6FE5;">+ Folder</button>
+      </div>
+
+      <div style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5A5F69;padding:8px 10px 0;">Library</div>
+      <nav style="display:flex;flex-direction:column;gap:2px;">
+        <sc-for list="{{ tree }}" as="n" hint-placeholder-count="10">
+          <div onClick="{{ n.onOpen }}" onDragOver="{{ n.onDragOver }}" onDrop="{{ n.onDrop }}" style="display:flex;align-items:center;gap:6px;padding:7px 10px 7px {{ n.pad }}px;border-radius:10px;cursor:pointer;background:{{ n.bg }};color:{{ n.color }};font-size:13px;" style-hover="background:rgba(255,255,255,.6);">
+            <span onClick="{{ n.onToggle }}" style="width:14px;font-family:'Geist Mono',monospace;font-size:10px;color:#8A8F99;text-align:center;">{{ n.chev }}</span>
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ n.name }}</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;color:#8A8F99;">{{ n.count }}</span>
+          </div>
+        </sc-for>
+      </nav>
+    </aside></sc-if>
+
+    <main onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="position:relative;min-height:0;display:flex;flex-direction:column;background:rgba(248,249,251,.72);border:1.5px solid rgba(255,255,255,.95);border-radius:24px;box-shadow:0 30px 60px rgba(40,50,70,.08);overflow:hidden;">
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeMenu }}" style="position:absolute;inset:0;z-index:40;"></div>
+      </sc-if>
+
+      <div style="padding:22px 26px 18px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid rgba(21,23,28,.08);">
+        <div style="display:flex;align-items:center;gap:8px;font-family:'Geist Mono',monospace;font-size:10px;color:#5A5F69;flex-wrap:wrap;">
+          <sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="2">
+            <button onClick="{{ c.onClick }}" style="background:none;border:0;padding:0;font:inherit;color:#5A5F69;cursor:pointer;" style-hover="color:#1F6FE5;">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+          <h1 style="margin:0;font-weight:400;font-size:clamp(24px,2.4vw,34px);line-height:1;text-transform:uppercase;letter-spacing:-.01em;">{{ title }}</h1>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;color:#5A5F69;">{{ countLabel }}</span>
+            <sc-if value="{{ canManageFolder }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:14px;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
+                <button onClick="{{ renameCurrent }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#15171C;cursor:pointer;" style-hover="color:#1F6FE5;">Rename</button>
+                <button onClick="{{ deleteCurrent }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#15171C;cursor:pointer;" style-hover="color:#B42318;">Delete</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto;padding:20px 26px 90px;display:flex;flex-direction:column;gap:22px;">
+        <sc-if value="{{ hasSubfolders }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">
+            <sc-for list="{{ subfolders }}" as="f" hint-placeholder-count="4">
+              <div onDragOver="{{ f.onDragOver }}" onDrop="{{ f.onDrop }}" style="position:relative;padding-top:10px;">
+                <div style="position:absolute;left:0;top:0;width:46%;height:16px;border-radius:9px 9px 0 0;background:{{ f.tabBg }};"></div>
+                <div onClick="{{ f.onOpen }}" style="position:relative;height:96px;border-radius:3px 12px 12px 12px;background:{{ f.bg }};color:{{ f.ink }};padding:12px 14px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.6);" style-hover="transform:translateY(-2px);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-family:'Geist Mono',monospace;font-size:10px;opacity:.8;">{{ f.count }}</span>
+                    <button onClick="{{ f.onMenu }}" style="background:none;border:0;padding:0 2px;font-size:14px;line-height:1;color:inherit;cursor:pointer;opacity:.7;">⋯</button>
+                  </div>
+                  <span style="font-size:13px;font-weight:500;line-height:1.25;">{{ f.name }}</span>
+                </div>
+                <sc-if value="{{ f.menuOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;right:6px;top:40px;z-index:50;min-width:140px;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(20,30,60,.18);padding:6px;display:flex;flex-direction:column;">
+                    <button onClick="{{ f.onRename }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="background:#F0F3F8;">Rename</button>
+                    <button onClick="{{ f.onAsk }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="background:#F0F3F8;">Ask about this folder</button>
+                    <button onClick="{{ f.onDelete }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#B42318;cursor:pointer;" style-hover="background:#FDECEA;">Delete</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:grid;grid-template-columns:{{ tableCols }};gap:12px;align-items:center;padding:0 10px 10px;border-bottom:1px solid rgba(21,23,28,.1);font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5A5F69;">
+            <input type="checkbox" checked="{{ allSelected }}" onChange="{{ toggleAll }}" style="accent-color:#1F6FE5;width:15px;height:15px;margin:0;"></input>
+            <span>Document</span><sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span>Type</span></sc-if><sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span>Updated</span></sc-if><span>Status</span><span></span>
+          </div>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+            <div draggable="true" onDragStart="{{ r.onDragStart }}" onClick="{{ r.onOpen }}" style="position:relative;display:grid;grid-template-columns:{{ tableCols }};gap:12px;align-items:center;padding:11px 10px;border-bottom:1px solid rgba(21,23,28,.06);border-radius:10px;cursor:pointer;background:{{ r.bg }};" style-hover="background:rgba(255,255,255,.75);">
+              <input type="checkbox" checked="{{ r.selected }}" onClick="{{ r.onSelect }}" onChange="{{ r.noop }}" style="accent-color:#1F6FE5;width:15px;height:15px;margin:0;"></input>
+              <div style="min-width:0;display:flex;flex-direction:column;gap:3px;">
+                <span style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;color:#5A5F69;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.meta }}</span>
+              </div>
+              <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span style="justify-self:start;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:{{ r.typeBg }};color:{{ r.typeInk }};">{{ r.type }}</span></sc-if>
+              <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span style="font-family:'Geist Mono',monospace;font-size:11px;color:#3A3E46;">{{ r.updated }}</span></sc-if>
+              <span style="display:flex;align-items:center;gap:6px;font-family:'Geist Mono',monospace;font-size:10px;color:{{ r.statusColor }};"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.statusColor }};"></span>{{ r.status }}</span>
+              <button onClick="{{ r.onMenu }}" style="background:none;border:0;padding:0;font-size:15px;color:#5A5F69;cursor:pointer;" style-hover="color:#15171C;">⋯</button>
+              <sc-if value="{{ r.uploading }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:50px;right:10px;bottom:0;height:2px;background:rgba(31,111,229,.15);border-radius:2px;"><div style="height:100%;width:{{ r.progress }}%;background:#1F6FE5;border-radius:2px;"></div></div>
+              </sc-if>
+              <sc-if value="{{ r.menuOpen }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ r.stop }}" style="position:absolute;right:10px;top:38px;z-index:50;min-width:160px;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(20,30,60,.18);padding:6px;display:flex;flex-direction:column;">
+                  <button onClick="{{ r.onAsk }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="background:#F0F3F8;">Ask about this</button>
+                  <button onClick="{{ r.onRename }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="background:#F0F3F8;">Rename</button>
+                  <button onClick="{{ r.onMove }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="background:#F0F3F8;">Move to…</button>
+                  <button onClick="{{ r.onDelete }}" style="text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;color:#B42318;cursor:pointer;" style-hover="background:#FDECEA;">Delete</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:56px 20px;text-align:center;">
+              <span style="font-size:13px;color:#3A3E46;">{{ emptyText }}</span>
+              <button onClick="{{ pickFiles }}" style="border:1px solid rgba(21,23,28,.3);background:transparent;border-radius:999px;padding:10px 22px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#15171C;cursor:pointer;" style-hover="border-color:#1F6FE5;color:#1F6FE5;">Upload files</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;align-items:center;gap:18px;background:#15171C;color:#fff;border-radius:999px;padding:10px 12px 10px 20px;box-shadow:0 20px 40px rgba(20,30,60,.25);font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;z-index:30;">
+          <span style="font-family:'Geist Mono',monospace;font-weight:400;">{{ selectionLabel }}</span>
+          <button onClick="{{ askSelected }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#9DC0F5;cursor:pointer;" style-hover="color:#fff;">Ask assistant</button>
+          <button onClick="{{ moveSelected }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#fff;cursor:pointer;" style-hover="color:#9DC0F5;">Move</button>
+          <button onClick="{{ deleteSelected }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#fff;cursor:pointer;" style-hover="color:#F7A39A;">Delete</button>
+          <button onClick="{{ clearSelection }}" style="border:0;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;padding:7px 12px;font:inherit;letter-spacing:inherit;cursor:pointer;">Clear</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ dragging }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:10px;z-index:45;border:2px dashed #1F6FE5;border-radius:18px;background:rgba(220,232,250,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none;">
+          <span style="font-weight:400;font-size:26px;text-transform:uppercase;">Drop to upload</span>
+          <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#0B4FC2;">into {{ dropTarget }}</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasUploads }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:16px;bottom:16px;width:300px;background:rgba(255,255,255,.95);border-radius:16px;box-shadow:0 20px 50px rgba(20,30,60,.16);padding:14px;z-index:35;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
+            <span>{{ uploadHeader }}</span>
+            <button onClick="{{ dismissUploads }}" style="background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:#5A5F69;cursor:pointer;" style-hover="color:#15171C;">Close</button>
+          </div>
+          <sc-for list="{{ uploads }}" as="u" hint-placeholder-count="1">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ u.name }}</span><span style="font-family:'Geist Mono',monospace;font-size:10px;color:{{ u.statusColor }};flex-shrink:0;">{{ u.status }}</span></div>
+              <div style="height:3px;background:#E6EAF0;border-radius:3px;"><div style="height:100%;width:{{ u.progress }}%;background:{{ u.statusColor }};border-radius:3px;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </main>
+
+    <sc-if value="{{ overlayOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeAssistant }}" style="position:fixed;inset:0;z-index:54;background:rgba(30,34,42,.18);"></div></sc-if>
+    <sc-if value="{{ assistantOpen }}" hint-placeholder-val="{{ false }}">
+      <aside style="min-height:0;display:flex;flex-direction:column;background:rgba(248,249,251,.82);border:1.5px solid rgba(255,255,255,.95);border-radius:24px;box-shadow:0 30px 60px rgba(40,50,70,.08);overflow:hidden;{{ asideStyle }}">
+        <div style="display:flex;gap:4px;padding:10px;border-bottom:1px solid rgba(21,23,28,.08);">
+          <button onClick="{{ tabAssistant }}" style="flex:1;border:0;border-radius:999px;padding:9px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:{{ tabABg }};color:{{ tabAInk }};">Assistant</button>
+          <button onClick="{{ tabDetails }}" style="flex:1;border:0;border-radius:999px;padding:9px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:{{ tabDBg }};color:{{ tabDInk }};">Details</button>
+        </div>
+
+        <sc-if value="{{ showAssistant }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
+            <div style="padding:16px 20px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                <span style="font-size:20px;font-weight:400;text-transform:uppercase;">Ask Arkib</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;color:#1F6FE5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ scopeLabel }}</span>
+              </div>
+              <button onClick="{{ newChat }}" style="background:none;border:0;padding:0;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#15171C;cursor:pointer;flex-shrink:0;" style-hover="color:#1F6FE5;">[ New chat ]</button>
+            </div>
+            <div ref="{{ chatRef }}" style="flex:1;min-height:0;overflow:auto;padding:4px 20px 16px;display:flex;flex-direction:column;gap:16px;">
+              <sc-if value="{{ noMessages }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:10px;padding-top:8px;">
+                  <p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:#3A3E46;">Ask a question in English or Bahasa Melayu. Answers come only from documents in scope, with sources.</p>
+                  <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="3">
+                    <button onClick="{{ s.onClick }}" style="text-align:left;border:1px solid rgba(21,23,28,.14);background:rgba(255,255,255,.6);border-radius:14px;padding:11px 14px;font:inherit;font-size:13px;color:#15171C;cursor:pointer;" style-hover="border-color:#1F6FE5;color:#1F6FE5;">{{ s.text }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-for list="{{ messages }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+                    <div style="align-self:flex-end;max-width:85%;background:#15171C;color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:13px;line-height:1.45;">{{ m.text }}</div>
+                  </sc-if>
+                  <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                      <div style="font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em;color:#1F6FE5;">{{ m.kicker }}</div>
+                      <div style="font-size:14px;line-height:1.55;color:#15171C;white-space:pre-wrap;text-wrap:pretty;">{{ m.text }}</div>
+                      <div style="display:flex;flex-direction:column;gap:6px;">
+                        <sc-for list="{{ m.cites }}" as="c" hint-placeholder-count="0">
+                          <button onClick="{{ c.onClick }}" style="display:flex;align-items:center;gap:10px;text-align:left;border:0;border-radius:12px;padding:10px 12px;background:{{ c.bg }};color:{{ c.ink }};font:inherit;cursor:pointer;" style-hover="transform:translateX(2px);">
+                            <span style="font-family:'Geist Mono',monospace;font-size:10px;opacity:.85;">[{{ c.n }}]</span>
+                            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.name }}</span><span style="font-family:'Geist Mono',monospace;font-size:9px;opacity:.85;">{{ c.ref }}</span></span>
+                          </button>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:10px;font-family:'Geist Mono',monospace;font-size:10px;color:#1F6FE5;"><span style="width:10px;height:10px;border-radius:50%;border:2px solid rgba(31,111,229,.25);border-top-color:#1F6FE5;animation:spin .8s linear infinite;"></span>{{ thinkingLabel }}</div>
+              </sc-if>
+            </div>
+            <form onSubmit="{{ send }}" style="margin:0 14px 14px;display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid rgba(21,23,28,.1);border-radius:20px;padding:8px 8px 8px 16px;">
+              <textarea value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" rows="2" placeholder="Ask about these documents…" style="flex:1;min-width:0;border:0;outline:none;resize:none;font:inherit;font-size:13px;line-height:1.45;color:#15171C;background:transparent;padding:6px 0;"></textarea>
+              <button type="submit" style="border:0;border-radius:999px;background:#1F6FE5;color:#fff;padding:10px 16px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;" style-hover="background:#0B4FC2;">Ask</button>
+            </form>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showDetails }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:18px;">
+            <sc-if value="{{ hasDoc }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:18px;">
+                <div style="border-radius:18px;padding:18px;min-height:150px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;gap:16px;background:{{ doc.cardBg }};color:{{ doc.cardInk }};box-shadow:0 14px 28px rgba(20,40,90,.18);">
+                  <div style="display:flex;justify-content:space-between;"><span style="font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.25);">{{ doc.type }}</span><span style="font-family:'Geist Mono',monospace;font-size:10px;">{{ doc.size }}</span></div>
+                  <div style="font-size:17px;font-weight:500;line-height:1.3;">{{ doc.name }}</div>
+                  <div style="font-family:'Geist Mono',monospace;font-size:10px;opacity:.9;">{{ doc.ref }}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <span style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5A5F69;">Summary</span>
+                  <p style="margin:0;font-size:13px;line-height:1.55;color:#15171C;">{{ doc.summary }}</p>
+                </div>
+                <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:12px;">
+                  <span style="color:#5A5F69;">Folder</span><span>{{ doc.path }}</span>
+                  <span style="color:#5A5F69;">Owner</span><span>{{ doc.owner }}</span>
+                  <span style="color:#5A5F69;">Updated</span><span style="font-family:'Geist Mono',monospace;font-size:11px;">{{ doc.updated }}</span>
+                  <span style="color:#5A5F69;">Status</span><span style="color:{{ doc.statusColor }};">{{ doc.status }}</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button onClick="{{ doc.onAsk }}" style="border:0;border-radius:999px;background:#1F6FE5;color:#fff;padding:10px 18px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;" style-hover="background:#0B4FC2;">Ask about this</button>
+                  <button onClick="{{ doc.onMove }}" style="border:1px solid rgba(21,23,28,.3);background:transparent;border-radius:999px;padding:10px 18px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#15171C;cursor:pointer;" style-hover="border-color:#1F6FE5;color:#1F6FE5;">Move</button>
+                  <button onClick="{{ doc.onRename }}" style="border:1px solid rgba(21,23,28,.3);background:transparent;border-radius:999px;padding:10px 18px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#15171C;cursor:pointer;" style-hover="border-color:#1F6FE5;color:#1F6FE5;">Rename</button>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noDoc }}" hint-placeholder-val="{{ true }}">
+              <p style="margin:0;font-size:13px;color:#5A5F69;">Select a document to see its summary and details.</p>
+            </sc-if>
+          </div>
+        </sc-if>
+      </aside>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(30,34,42,.22);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);"></div>
+      <form onSubmit="{{ confirmModal }}" style="position:relative;width:min(420px,100%);background:rgba(248,249,251,.96);border:1.5px solid #fff;border-radius:24px;padding:26px;box-shadow:0 40px 80px rgba(20,30,60,.2);display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <span style="font-size:22px;font-weight:400;text-transform:uppercase;">{{ modal.title }}</span>
+          <span style="font-size:13px;line-height:1.5;color:#3A3E46;">{{ modal.body }}</span>
+        </div>
+        <sc-if value="{{ modal.hasInput }}" hint-placeholder-val="{{ false }}">
+          <input ref="{{ modalInputRef }}" value="{{ modal.value }}" onChange="{{ onModalValue }}" placeholder="Folder name" style="border:1px solid rgba(21,23,28,.14);background:#fff;border-radius:12px;padding:13px 14px;font:inherit;font-size:14px;color:#15171C;outline:none;" style-focus="border-color:#1F6FE5;box-shadow:0 0 0 3px rgba(31,111,229,.15);"></input>
+        </sc-if>
+        <sc-if value="{{ modal.isMove }}" hint-placeholder-val="{{ false }}">
+          <div style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:2px;background:#fff;border-radius:12px;padding:6px;">
+            <sc-for list="{{ moveTargets }}" as="t" hint-placeholder-count="6">
+              <button type="button" onClick="{{ t.onClick }}" style="text-align:left;border:0;border-radius:8px;padding:8px 10px 8px {{ t.pad }}px;font:inherit;font-size:13px;cursor:pointer;background:{{ t.bg }};color:{{ t.ink }};">{{ t.name }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalError }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#B42318;">{{ modalError }}</span></sc-if>
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button type="button" onClick="{{ closeModal }}" style="border:1px solid rgba(21,23,28,.3);background:transparent;border-radius:999px;padding:11px 20px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#15171C;cursor:pointer;">Cancel</button>
+          <button type="submit" style="border:0;border-radius:999px;background:{{ modal.btnBg }};color:#fff;padding:11px 22px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">{{ modal.cta }}</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;assistantPanel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;open&quot;,&quot;closed&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const KEY = 'arkib-library-v1';
+const TYPES = {
+  CIRCULAR: ['#1F6FE5', '#fff'], SOP: ['#0B4FC2', '#fff'], MINUTES: ['#96BAF0', '#0B2A5C'], POLICY: ['#CDDEF6', '#15171C'],
+  GUIDELINE: ['#4A8DEC', '#fff'], REPORT: ['#E9EDF3', '#15171C'], DOCUMENT: ['#E2E5EA', '#3A3E46'],
+};
+const ROOT_TYPE = { policies: 'POLICY', sops: 'SOP', circulars: 'CIRCULAR', guidelines: 'GUIDELINE', reports: 'REPORT', minutes: 'MINUTES' };
+const SEED_FOLDERS = [
+  ['inbox', 'Inbox', null], ['policies', 'Policies', null], ['sops', 'SOPs', null], ['sop-fin', 'Finance', 'sops'], ['sop-cx', 'Customer service', 'sops'],
+  ['circulars', 'Circulars', null], ['circ-2025', '2025', 'circulars'], ['circ-2026', '2026', 'circulars'], ['guidelines', 'Guidelines', null],
+  ['reports', 'Reports', null], ['minutes', 'Minutes', null], ['min-fin', 'Finance committee', 'minutes'], ['min-dig', 'Digitalisation steering', 'minutes'],
+].map(([id, name, parent]) => ({ id, name, parent }));
+const S = (id, name, folder, type, ref, updated, owner, size, summary) => ({ id, name, folder, type, ref, updated, owner, size, summary, status: 'ready' });
+const SEED_FILES = [
+  S('d1', 'Treasury Circular PK 2.1/2025 — Direct procurement', 'circ-2025', 'CIRCULAR', 'PK 2.1/2025 · §4.2', '2025-03-12', 'Finance Division', '1.2 MB', 'Direct procurement is permitted up to RM50,000 with Head of Department approval (§4.2). Purchases above RM50,000 require quotations; above RM500,000 require open tender through the tender committee.'),
+  S('d2', 'Circular 3/2026 — Hybrid work arrangements', 'circ-2026', 'CIRCULAR', 'PKP 3/2026', '2026-01-20', 'HR Division', '640 KB', 'Officers may work remotely up to 2 days per week with supervisor approval. Core hours are 10:00–15:00. Effective 1 February 2026.'),
+  S('d3', 'Circular 5/2026 — Records retention schedule', 'circ-2026', 'CIRCULAR', 'PKP 5/2026', '2026-04-08', 'Records Unit', '880 KB', 'Financial records are retained 7 years; HR files 7 years after separation; meeting minutes permanently. Disposal requires Records Officer sign-off.'),
+  S('d4', 'Procurement Policy 2024 (rev.)', 'policies', 'POLICY', 'POL-PRC-2024 · Ch.2', '2024-11-02', 'Procurement Unit', '2.4 MB', 'Sets principles of value for money, transparency and accountability. Conflicts of interest must be declared before evaluation. Chapter 2 defines purchase thresholds aligned to PK 2.1/2025.'),
+  S('d5', 'Information Security Policy v4', 'policies', 'POLICY', 'POL-ISM-04', '2025-08-19', 'ICT Division', '1.8 MB', 'Data is classified Public, Internal, Confidential or Secret. Confidential documents may not be emailed externally. Passwords rotate every 90 days; MFA is mandatory.'),
+  S('d6', 'Personal Data Handling Policy', 'policies', 'POLICY', 'POL-PDP-02', '2025-05-30', 'Legal Unit', '920 KB', 'Personal data is collected only for a stated purpose; access is logged; breaches must be reported to the Data Protection Officer within 24 hours.'),
+  S('d7', 'SOP-FIN-12 — Purchase approval workflow', 'sop-fin', 'SOP', 'SOP-FIN-12 rev.2 · Step 3', '2026-02-14', 'Finance Division', '540 KB', 'Requester raises a purchase request; Finance runs a budget check; HOD approves up to RM50,000; higher amounts route to the tender committee. Target turnaround is 5 working days.'),
+  S('d8', 'SOP-FIN-04 — Claims & reimbursement', 'sop-fin', 'SOP', 'SOP-FIN-04', '2025-10-03', 'Finance Division', '410 KB', 'Claims must be submitted within 30 days of the expense with receipts, approved by the immediate supervisor, and are paid within 14 days.'),
+  S('d9', 'SOP-CX-07 — Public complaints handling', 'sop-cx', 'SOP', 'SOP-CX-07 rev.3 · p.6', '2026-03-01', 'Customer Service', '700 KB', 'Acknowledge complaints within 3 working days and resolve within 15. Unresolved cases escalate to the Integrity Unit. Every complaint is logged in the CRM.'),
+  S('d10', 'SOP-CX-02 — Counter service standards', 'sop-cx', 'SOP', 'SOP-CX-02', '2025-07-22', 'Customer Service', '380 KB', 'Counter waiting time target is under 15 minutes. Officers wear name tags. A feedback form is offered after each transaction.'),
+  S('d11', 'Quotation thresholds — quick guide', 'guidelines', 'GUIDELINE', 'GL-PRC-01', '2025-04-11', 'Procurement Unit', '160 KB', 'Below RM50,000: direct purchase. RM50,000–RM500,000: quotations from at least 5 suppliers. Above RM500,000: open tender.'),
+  S('d12', 'Writing guideline for official letters', 'guidelines', 'GUIDELINE', 'GL-COM-03', '2024-09-15', 'Corporate Comms', '290 KB', 'Use Bahasa Melayu for official correspondence; English is permitted for international parties. Reference number format: AGY.100-1/2/3.'),
+  S('d13', 'Audit findings: procurement Q2 2026', 'reports', 'REPORT', 'AUD-2026-Q2 · §3', '2026-07-05', 'Internal Audit', '3.1 MB', 'Found 4 instances of split purchases used to avoid the quotation threshold. Recommends a quarterly vendor spend review and refresher training.'),
+  S('d14', 'Annual Digitalisation Report 2025', 'reports', 'REPORT', 'RPT-DIG-2025', '2026-01-30', 'ICT Division', '5.6 MB', '62% of services are online; average processing time fell from 9 to 4 days. Priorities for 2026: records digitisation and knowledge search.'),
+  S('d15', 'Finance committee — 14 Aug 2026', 'min-fin', 'MINUTES', 'MTG-2026-031 · Item 5.1', '2026-08-15', 'Secretariat', '240 KB', 'Approved Q4 budget reallocation of RM1.2M to digitisation. Item 5.1 reaffirmed the RM50,000 HOD approval limit. Action: Finance to issue a reminder circular.'),
+  S('d16', 'Finance committee — 10 Jul 2026', 'min-fin', 'MINUTES', 'MTG-2026-027', '2026-07-11', 'Secretariat', '220 KB', 'Reviewed Q2 audit findings; agreed a quarterly vendor spend review. Action: Procurement Unit to report split-purchase checks.'),
+  S('d17', 'Digitalisation steering — 2 Sep 2026', 'min-dig', 'MINUTES', 'MTG-2026-034', '2026-09-03', 'Secretariat', '260 KB', 'Arkib pilot approved for 3 divisions. ICT to scope records migration by Q4. Next review on 2 December 2026.'),
+];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmtDate = s => { const d = new Date(s); return `${String(d.getDate()).padStart(2, '0')} ${MON[d.getMonth()]} ${d.getFullYear()}`; };
+const fmtSize = b => b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' KB';
+const WIN = () => document.defaultView || window;
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    this.state = {
+      folders: saved?.folders || SEED_FOLDERS, files: (saved?.files || SEED_FILES).map(f => f.status === 'ready' ? f : { ...f, status: 'ready' }),
+      current: 'all', expanded: { sops: true, circulars: true, minutes: true }, filter: '', selected: {}, menu: null,
+      dragging: false, uploads: [], tab: 'assistant', docId: null, assistantOpen: p.assistantPanel === 'open' ? true : p.assistantPanel === 'closed' ? false : (document.defaultView || window).innerWidth >= 1180,
+      messages: [], draft: '', thinking: false, vw: 1440, scopeOverride: null, modal: null, modalError: '',
+    };
+    this.fileInput = null; this.chatEl = null; this.modalInput = null; this.dragFileId = null;
+  }
+  componentDidUpdate() {
+    const ps = this._prev || {}; this._prev = this.state;
+    if (ps.folders !== this.state.folders || ps.files !== this.state.files) {
+      try { localStorage.setItem(KEY, JSON.stringify({ folders: this.state.folders, files: this.state.files.map(({ content, ...f }) => f) })); } catch (e) {}
+    }
+    if (ps.messages !== this.state.messages || ps.thinking !== this.state.thinking) { const c = this.chatEl; if (c) c.scrollTop = c.scrollHeight; }
+    if (!ps.modal && this.state.modal && this.modalInput) setTimeout(() => this.modalInput && this.modalInput.focus(), 30);
+  }
+  componentDidMount() { const W = WIN(); this._rs = () => this.setState({ vw: W.innerWidth }); if ((this.props.assistantPanel ?? 'auto') === 'auto' && W.innerWidth < 1180) this.setState({ assistantOpen: false }); W.addEventListener('resize', this._rs); this._rs(); }
+  componentWillUnmount() { clearInterval(this._up); WIN().removeEventListener('resize', this._rs); }
+
+  folder(id) { return this.state.folders.find(f => f.id === id); }
+  children(id) { return this.state.folders.filter(f => f.parent === id); }
+  descendants(id) { const out = [id]; for (let i = 0; i < out.length; i++) this.children(out[i]).forEach(c => out.push(c.id)); return out; }
+  pathOf(id) { const p = []; let f = this.folder(id); while (f) { p.unshift(f); f = this.folder(f.parent); } return p; }
+  filesIn(id) { if (id === 'all') return this.state.files; const set = new Set(this.descendants(id)); return this.state.files.filter(f => set.has(f.folder)); }
+  rootOf(id) { const p = this.pathOf(id); return p[0]?.id; }
+
+  open(id) { const exp = { ...this.state.expanded }; if (id !== 'all') this.pathOf(id).forEach(f => exp[f.id] = true); this.setState({ current: id, expanded: exp, selected: {}, menu: null, scopeOverride: null }); }
+
+  onFiles(list) {
+    const arr = Array.from(list || []); if (!arr.length) return;
+    const target = this.state.current === 'all' ? 'inbox' : this.state.current;
+    const rt = ROOT_TYPE[this.rootOf(target)];
+    const now = new Date().toISOString().slice(0, 10);
+    const made = arr.map((file, i) => {
+      const n = file.name.toLowerCase();
+      const type = /sop/.test(n) ? 'SOP' : /circular|pekeliling/.test(n) ? 'CIRCULAR' : /minit|minutes/.test(n) ? 'MINUTES' : /polic|dasar/.test(n) ? 'POLICY' : /guide|garis/.test(n) ? 'GUIDELINE' : /report|laporan/.test(n) ? 'REPORT' : rt || 'DOCUMENT';
+      const id = 'u' + Date.now().toString(36) + i;
+      const rec = { id, name: file.name.replace(/\.[^.]+$/, ''), folder: target, type, ref: file.name.split('.').pop().toUpperCase() + ' upload', updated: now, owner: 'You', size: fmtSize(file.size), status: 'uploading', progress: 0, summary: 'Uploaded by you. A summary will appear once indexing completes.' };
+      if (/^text\/|json|csv|markdown/.test(file.type) || /\.(txt|md|csv)$/i.test(file.name)) {
+        const r = new FileReader(); r.onload = () => this.setState(s => ({ files: s.files.map(f => f.id === id ? { ...f, content: String(r.result).slice(0, 5000) } : f) })); r.readAsText(file);
+      }
+      return rec;
+    });
+    this.setState(s => ({ files: [...made, ...s.files], uploads: [...made.map(m => ({ id: m.id, name: m.name })), ...s.uploads].slice(0, 6), dragging: false }));
+    this.runUploads();
+  }
+  runUploads() {
+    if (this._up) return;
+    this._up = WIN().setInterval(() => {
+      let busy = false;
+      const files = this.state.files.map(f => {
+        if (f.status === 'uploading') { busy = true; const p = Math.min(100, (f.progress || 0) + 6 + Math.random() * 12); return p >= 100 ? { ...f, progress: 100, status: 'indexing', idxAt: Date.now() } : { ...f, progress: p }; }
+        if (f.status === 'indexing') { busy = true; if (Date.now() - f.idxAt > 1800) return { ...f, status: 'ready', summary: f.content ? 'Text extracted and indexed. Ask the assistant about its contents.' : 'Indexed. Ask the assistant to find this document by name, type or folder.' }; }
+        return f;
+      });
+      this.setState({ files });
+      if (!busy) { clearInterval(this._up); this._up = null; }
+    }, 140);
+  }
+
+  openModal(m) { this.setState({ modal: { value: '', ...m }, modalError: '', menu: null }); }
+  confirm() {
+    const m = this.state.modal; if (!m) return; const s = this.state;
+    if (m.kind === 'newFolder' || m.kind === 'renameFolder' || m.kind === 'renameFile') {
+      const v = (m.value || '').trim(); if (!v) return this.setState({ modalError: 'Enter a name.' });
+      if (m.kind === 'newFolder') {
+        if (this.children(m.parent).some(f => f.name.toLowerCase() === v.toLowerCase())) return this.setState({ modalError: 'A folder with that name already exists here.' });
+        const id = 'f' + Date.now().toString(36);
+        this.setState({ folders: [...s.folders, { id, name: v, parent: m.parent }], expanded: { ...s.expanded, ...(m.parent ? { [m.parent]: true } : {}) }, modal: null });
+      } else if (m.kind === 'renameFolder') this.setState({ folders: s.folders.map(f => f.id === m.id ? { ...f, name: v } : f), modal: null });
+      else this.setState({ files: s.files.map(f => f.id === m.id ? { ...f, name: v } : f), modal: null });
+    } else if (m.kind === 'move') {
+      if (!m.target) return this.setState({ modalError: 'Choose a destination folder.' });
+      const ids = new Set(m.ids); this.setState({ files: s.files.map(f => ids.has(f.id) ? { ...f, folder: m.target } : f), modal: null, selected: {} });
+    } else if (m.kind === 'deleteFolder') {
+      const set = new Set(this.descendants(m.id)); const parent = this.folder(m.id)?.parent;
+      this.setState({ folders: s.folders.filter(f => !set.has(f.id)), files: s.files.filter(f => !set.has(f.folder)), modal: null, current: set.has(s.current) ? (parent || 'all') : s.current });
+    } else if (m.kind === 'deleteFiles') {
+      const ids = new Set(m.ids); this.setState({ files: s.files.filter(f => !ids.has(f.id)), modal: null, selected: {}, docId: ids.has(s.docId) ? null : s.docId });
+    }
+  }
+  renameFolder(id) { const f = this.folder(id); this.openModal({ kind: 'renameFolder', id, value: f.name, title: 'Rename folder', body: 'Documents inside keep their place.', cta: 'Rename', hasInput: true }); }
+  deleteFolder(id) { const f = this.folder(id), n = this.filesIn(id).length, sub = this.descendants(id).length - 1; this.openModal({ kind: 'deleteFolder', id, title: 'Delete folder', body: `“${f.name}”${sub ? ` and ${sub} subfolder${sub > 1 ? 's' : ''}` : ''} will be removed${n ? `, along with ${n} document${n > 1 ? 's' : ''}` : ''}. This can't be undone.`, cta: 'Delete', danger: true }); }
+  moveFiles(ids) { this.openModal({ kind: 'move', ids, target: null, title: ids.length > 1 ? `Move ${ids.length} documents` : 'Move document', body: 'Choose a destination folder.', cta: 'Move here', isMove: true }); }
+  deleteFiles(ids) { this.openModal({ kind: 'deleteFiles', ids, title: ids.length > 1 ? `Delete ${ids.length} documents` : 'Delete document', body: 'They will be removed from the library and the search index.', cta: 'Delete', danger: true }); }
+  renameFile(id) { const f = this.state.files.find(x => x.id === id); this.openModal({ kind: 'renameFile', id, value: f.name, title: 'Rename document', body: 'The reference number stays the same.', cta: 'Rename', hasInput: true }); }
+
+  scopeDocs() {
+    const o = this.state.scopeOverride;
+    if (o?.ids) return this.state.files.filter(f => o.ids.includes(f.id));
+    return this.filesIn(o?.folder || this.state.current);
+  }
+  scopeName() {
+    const o = this.state.scopeOverride;
+    if (o?.ids) return o.ids.length === 1 ? (this.state.files.find(f => f.id === o.ids[0])?.name || '1 document') : `${o.ids.length} selected documents`;
+    const id = o?.folder || this.state.current; return id === 'all' ? 'Entire library' : this.pathOf(id).map(f => f.name).join(' / ');
+  }
+  askWith(scope, q) { this.setState({ scopeOverride: scope, tab: 'assistant', assistantOpen: true, menu: null, messages: [], draft: q || '' }); }
+
+  async ask(q) {
+    q = (q || '').trim(); if (!q || this.state.thinking) return;
+    const docs = this.scopeDocs().filter(d => d.status === 'ready');
+    const history = this.state.messages.slice(-6);
+    this.setState(s => ({ messages: [...s.messages, { role: 'user', text: q }], draft: '', thinking: true }));
+    let answer = '', cite = [];
+    try {
+      const C = WIN().claude;
+      if (!C || !docs.length) throw new Error('offline');
+      const list = docs.map(d => `[${d.id}] ${d.name} | ${d.type} | ${d.ref} | folder: ${this.pathOf(d.folder).map(f => f.name).join('/')} | ${d.summary}${d.content ? ' | CONTENT: ' + d.content.slice(0, 1500) : ''}`).join('\n');
+      const convo = history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`).join('\n');
+      const prompt = `You are Arkib, the document assistant for a Malaysian government agency. Answer ONLY using the documents below. If they don't cover the question, say so briefly and suggest which folder or document type might. Reply in the user's language (English or Bahasa Melayu). Be concise: under 90 words, plain text, no markdown. Use the reference numbers when helpful.\nReturn ONLY JSON: {"answer": string, "cite": [document ids you used, most relevant first]}\n\nDOCUMENTS:\n${list}\n\n${convo ? 'CONVERSATION SO FAR:\n' + convo + '\n\n' : ''}User: ${q}`;
+      const raw = await C.complete(prompt);
+      const j = JSON.parse((raw.match(/\{[\s\S]*\}/) || [raw])[0]);
+      answer = j.answer; cite = (j.cite || []).filter(id => docs.some(d => d.id === id)).slice(0, 4);
+    } catch (e) {
+      const words = q.toLowerCase().split(/\W+/).filter(w => w.length > 2);
+      const scored = docs.map(d => ({ d, s: words.reduce((a, w) => a + ((d.name + ' ' + d.summary + ' ' + d.ref).toLowerCase().includes(w) ? 1 : 0), 0) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 3);
+      if (!docs.length) answer = 'There are no indexed documents in this scope yet.';
+      else if (!scored.length) answer = 'I couldn’t find anything on that in this scope. Try widening the scope to the entire library.';
+      else { answer = scored[0].d.summary; cite = scored.map(x => x.d.id); }
+    }
+    this.setState(s => ({ messages: [...s.messages, { role: 'bot', text: answer || 'No answer returned.', cite, count: docs.length }], thinking: false }));
+  }
+
+  renderVals() {
+    const s = this.state, P = this.props;
+    const cur = s.current, curFolder = this.folder(cur);
+    const q = s.filter.trim().toLowerCase();
+
+    const tree = [{ id: 'all', name: 'All documents', depth: 0, kids: false }];
+    const walk = (pid, depth) => this.children(pid).forEach(f => { const kids = this.children(f.id).length > 0; tree.push({ id: f.id, name: f.name, depth, kids }); if (kids && s.expanded[f.id]) walk(f.id, depth + 1); });
+    walk(null, 0);
+    const dropOn = id => e => { e.preventDefault(); e.stopPropagation(); if (this.dragFileId) { const fid = this.dragFileId; this.dragFileId = null; this.setState(st => ({ files: st.files.map(f => f.id === fid ? { ...f, folder: id } : f), dragging: false })); } else if (e.dataTransfer?.files?.length) { this.setState({ current: id }, () => this.onFiles(e.dataTransfer.files)); } };
+    const treeRows = tree.map(n => ({
+      name: n.name, count: this.filesIn(n.id).length, pad: 10 + n.depth * 16,
+      chev: n.kids ? (s.expanded[n.id] ? '▾' : '▸') : '',
+      bg: cur === n.id ? '#fff' : 'transparent', color: cur === n.id ? '#1F6FE5' : '#15171C',
+      onOpen: () => this.open(n.id),
+      onToggle: e => { if (!n.kids) return; e.stopPropagation(); this.setState({ expanded: { ...s.expanded, [n.id]: !s.expanded[n.id] } }); },
+      onDragOver: e => { if (n.id !== 'all') e.preventDefault(); }, onDrop: n.id === 'all' ? (e => e.preventDefault()) : dropOn(n.id),
+    }));
+
+    const subs = (cur === 'all' ? this.children(null) : this.children(cur)).map((f, i) => {
+      const rt = ROOT_TYPE[this.rootOf(f.id)] || 'DOCUMENT'; const t = TYPES[rt];
+      const isMenu = s.menu?.kind === 'folder' && s.menu.id === f.id;
+      return {
+        name: f.name, count: String(this.filesIn(f.id).length).padStart(2, '0'), bg: t[0], tabBg: t[0], ink: t[1], menuOpen: isMenu,
+        onOpen: () => this.open(f.id),
+        onMenu: e => { e.stopPropagation(); this.setState({ menu: isMenu ? null : { kind: 'folder', id: f.id } }); },
+        onRename: () => this.renameFolder(f.id), onDelete: () => this.deleteFolder(f.id), onAsk: () => this.askWith({ folder: f.id }),
+        onDragOver: e => e.preventDefault(), onDrop: dropOn(f.id),
+      };
+    });
+
+    const directOnly = cur !== 'all' && !q;
+    let list = (directOnly ? s.files.filter(f => f.folder === cur) : this.filesIn(cur));
+    if (q) list = list.filter(f => (f.name + ' ' + f.ref + ' ' + f.type).toLowerCase().includes(q));
+    list = [...list].sort((a, b) => (b.updated > a.updated ? 1 : -1));
+    const rows = list.map(f => {
+      const t = TYPES[f.type] || TYPES.DOCUMENT; const isMenu = s.menu?.kind === 'file' && s.menu.id === f.id;
+      const st = f.status === 'uploading' ? ['Uploading ' + Math.round(f.progress || 0) + '%', '#1F6FE5'] : f.status === 'indexing' ? ['Indexing', '#4A8DEC'] : ['Indexed', '#2E7D5B'];
+      const where = cur === 'all' || q || f.folder !== cur ? ' · ' + this.pathOf(f.folder).map(x => x.name).join(' / ') : '';
+      return {
+        name: f.name, meta: f.ref + where, type: f.type, typeBg: t[0], typeInk: t[1], updated: fmtDate(f.updated), status: st[0], statusColor: st[1],
+        uploading: f.status === 'uploading', progress: f.progress || 0, selected: !!s.selected[f.id], menuOpen: isMenu,
+        bg: s.docId === f.id ? 'rgba(220,232,250,.7)' : s.selected[f.id] ? 'rgba(255,255,255,.6)' : 'transparent',
+        onOpen: () => this.setState({ docId: f.id, tab: 'details', assistantOpen: true, menu: null }),
+        onSelect: e => { e.stopPropagation(); const sel = { ...s.selected }; if (sel[f.id]) delete sel[f.id]; else sel[f.id] = true; this.setState({ selected: sel }); },
+        noop: () => {}, stop: e => e.stopPropagation(),
+        onMenu: e => { e.stopPropagation(); this.setState({ menu: isMenu ? null : { kind: 'file', id: f.id } }); },
+        onAsk: () => this.askWith({ ids: [f.id] }), onRename: () => this.renameFile(f.id), onMove: () => this.moveFiles([f.id]), onDelete: () => this.deleteFiles([f.id]),
+        onDragStart: e => { this.dragFileId = f.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', f.id); },
+      };
+    });
+    const selIds = Object.keys(s.selected).filter(id => s.files.some(f => f.id === id));
+    const total = this.filesIn(cur).length;
+
+    const crumbs = [{ label: 'Library', onClick: () => this.open('all') }, ...(cur === 'all' ? [] : this.pathOf(cur).map(f => ({ label: '/ ' + f.name, onClick: () => this.open(f.id) })))];
+
+    const ups = s.uploads.map(u => s.files.find(f => f.id === u.id)).filter(Boolean);
+    const upBusy = ups.filter(f => f.status !== 'ready').length;
+
+    const sc = this.scopeDocs();
+    const suggestions = (s.scopeOverride?.ids?.length === 1 ? ['Summarise this document', 'What actions or deadlines does it set?', 'Who does this apply to?'] : ['What is the approval limit for direct procurement?', 'How fast must public complaints be resolved?', 'What did the finance committee decide in August?']).map(text => ({ text, onClick: () => this.ask(text) }));
+    const messages = s.messages.map(m => ({
+      isUser: m.role === 'user', isBot: m.role === 'bot', text: m.text,
+      kicker: m.cite?.length ? `ANSWER · ${m.cite.length} SOURCE${m.cite.length > 1 ? 'S' : ''}` : `SEARCHED ${m.count || 0} DOCUMENTS`,
+      cites: (m.cite || []).map((id, i) => { const d = s.files.find(f => f.id === id); if (!d) return null; const t = TYPES[d.type] || TYPES.DOCUMENT; return { n: i + 1, name: d.name, ref: d.ref, bg: t[0], ink: t[1], onClick: () => this.setState({ docId: d.id, tab: 'details', current: d.folder, expanded: { ...s.expanded, ...Object.fromEntries(this.pathOf(d.folder).map(f => [f.id, true])) } }) }; }).filter(Boolean),
+    }));
+
+    const d = s.files.find(f => f.id === s.docId);
+    const dt = d ? (TYPES[d.type] || TYPES.DOCUMENT) : TYPES.DOCUMENT;
+    const doc = d ? {
+      name: d.name, type: d.type, ref: d.ref, size: d.size, summary: d.summary, owner: d.owner, updated: fmtDate(d.updated),
+      path: this.pathOf(d.folder).map(f => f.name).join(' / '), cardBg: `linear-gradient(160deg,rgba(255,255,255,.35),rgba(255,255,255,0) 55%),${dt[0]}`, cardInk: dt[1],
+      status: d.status === 'ready' ? 'Indexed' : d.status === 'indexing' ? 'Indexing' : 'Uploading', statusColor: d.status === 'ready' ? '#2E7D5B' : '#1F6FE5',
+      onAsk: () => this.askWith({ ids: [d.id] }), onMove: () => this.moveFiles([d.id]), onRename: () => this.renameFile(d.id),
+    } : {};
+
+    const m = s.modal;
+    const moveTargets = [];
+    const walkT = (pid, depth) => this.children(pid).forEach(f => { moveTargets.push({ name: f.name, pad: 10 + depth * 16, bg: m?.target === f.id ? '#1F6FE5' : 'transparent', ink: m?.target === f.id ? '#fff' : '#15171C', onClick: () => this.setState({ modal: { ...m, target: f.id }, modalError: '' }) }); walkT(f.id, depth + 1); });
+    if (m?.isMove) walkT(null, 0);
+
+    const aOpen = s.assistantOpen;
+    const overlay = s.vw < 1180;
+    const mainW = s.vw - (s.vw < 760 ? 24 : 240) - (aOpen && !overlay ? 392 : 0);
+    const compact = mainW < 620;
+    const tableCols = compact ? '28px minmax(0,1fr) 92px 28px' : '28px minmax(0,1fr) 96px 120px 96px 28px';
+    return {
+      gridCols: s.vw < 760 ? 'minmax(0,1fr)' : '216px minmax(0,1fr)' + (aOpen && !overlay ? ' minmax(320px,380px)' : ''),
+      asideStyle: overlay ? 'position:fixed;top:64px;right:12px;bottom:12px;width:min(400px,calc(100vw - 24px));z-index:55;background:#F6F7F9;box-shadow:0 30px 80px rgba(20,30,60,.25);' : '',
+      overlayOpen: overlay && aOpen, closeAssistant: () => this.setState({ assistantOpen: false }),
+      showTree: s.vw >= 760, tableCols: tableCols, compact: compact, wide: !compact,
+      filter: s.filter, onFilter: e => this.setState({ filter: e.target.value }),
+      assistantOpen: aOpen, assistantToggleLabel: aOpen ? 'Hide assistant' : 'Show assistant', toggleAssistant: () => this.setState({ assistantOpen: !aOpen }),
+      fileInputRef: el => { this.fileInput = el; }, pickFiles: () => this.fileInput && this.fileInput.click(), onFileInput: e => { this.onFiles(e.target.files); e.target.value = ''; },
+      openNewFolder: () => this.openModal({ kind: 'newFolder', parent: cur === 'all' ? null : cur, title: 'New folder', body: cur === 'all' ? 'Creates a top-level folder in the library.' : `Creates a folder inside ${curFolder?.name}.`, cta: 'Create', hasInput: true }),
+      tree: treeRows, crumbs,
+      title: cur === 'all' ? 'All documents' : curFolder?.name || '',
+      countLabel: `${String(total).padStart(2, '0')} DOCUMENTS`,
+      canManageFolder: cur !== 'all', renameCurrent: () => this.renameFolder(cur), deleteCurrent: () => this.deleteFolder(cur),
+      hasSubfolders: subs.length > 0 && !q, subfolders: subs,
+      rows, isEmpty: rows.length === 0, emptyText: q ? `No documents match “${s.filter}”.` : subs.length ? 'No documents directly in this folder. Open a subfolder or upload here.' : 'This folder is empty. Drag files here or upload.',
+      allSelected: rows.length > 0 && rows.every(r => r.selected),
+      toggleAll: () => { const all = rows.length && rows.every(r => r.selected); this.setState({ selected: all ? {} : Object.fromEntries(list.map(f => [f.id, true])) }); },
+      hasSelection: selIds.length > 0, selectionLabel: `${selIds.length} selected`,
+      askSelected: () => this.askWith({ ids: selIds }), moveSelected: () => this.moveFiles(selIds), deleteSelected: () => this.deleteFiles(selIds), clearSelection: () => this.setState({ selected: {} }),
+      menuOpen: !!s.menu, closeMenu: () => this.setState({ menu: null }),
+      dragging: s.dragging, dropTarget: cur === 'all' ? 'Inbox' : curFolder?.name,
+      onDragOver: e => { e.preventDefault(); if (!this.dragFileId && e.dataTransfer?.types?.includes('Files') && !s.dragging) this.setState({ dragging: true }); },
+      onDragLeave: e => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ dragging: false }); },
+      onDrop: e => { e.preventDefault(); this.dragFileId = null; this.setState({ dragging: false }); if (e.dataTransfer?.files?.length) this.onFiles(e.dataTransfer.files); },
+      hasUploads: ups.length > 0, uploadHeader: upBusy ? `Uploading ${upBusy} of ${ups.length}` : `${ups.length} uploaded`,
+      uploads: ups.map(f => ({ name: f.name, progress: f.status === 'uploading' ? f.progress : 100, status: f.status === 'uploading' ? Math.round(f.progress) + '%' : f.status === 'indexing' ? 'Indexing' : 'Ready', statusColor: f.status === 'ready' ? '#2E7D5B' : '#1F6FE5' })),
+      dismissUploads: () => this.setState({ uploads: [] }),
+      tabAssistant: () => this.setState({ tab: 'assistant' }), tabDetails: () => this.setState({ tab: 'details' }),
+      tabABg: s.tab === 'assistant' ? '#15171C' : 'transparent', tabAInk: s.tab === 'assistant' ? '#fff' : '#15171C',
+      tabDBg: s.tab === 'details' ? '#15171C' : 'transparent', tabDInk: s.tab === 'details' ? '#fff' : '#15171C',
+      showAssistant: s.tab === 'assistant', showDetails: s.tab === 'details',
+      scopeLabel: `IN SCOPE: ${this.scopeName()} · ${sc.length}`,
+      newChat: () => this.setState({ messages: [], scopeOverride: null, draft: '' }),
+      chatRef: el => { this.chatEl = el; },
+      noMessages: s.messages.length === 0 && !s.thinking, suggestions, messages,
+      thinking: s.thinking, thinkingLabel: `Reading ${sc.filter(x => x.status === 'ready').length} documents…`,
+      draft: s.draft, onDraft: e => this.setState({ draft: e.target.value }),
+      onDraftKey: e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.ask(s.draft); } },
+      send: e => { e.preventDefault(); this.ask(s.draft); },
+      hasDoc: !!d, noDoc: !d, doc,
+      modalOpen: !!m, modal: m ? { ...m, btnBg: m.danger ? '#B42318' : '#1F6FE5', hasInput: !!m.hasInput, isMove: !!m.isMove } : {},
+      modalError: s.modalError, moveTargets,
+      modalInputRef: el => { this.modalInput = el; },
+      onModalValue: e => this.setState({ modal: { ...m, value: e.target.value }, modalError: '' }),
+      closeModal: () => this.setState({ modal: null }),
+      confirmModal: e => { e.preventDefault(); this.confirm(); },
+    };
+  }
+}
+</script>
+</body>
+</html>

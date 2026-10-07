@@ -1,0 +1,5 @@
+Enterprise_DMS_Prototype_PRD_whitepaper.pdf
+.env
+.env.*
+!.env.example
+.DS_Store

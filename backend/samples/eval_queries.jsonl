@@ -1,0 +1,26 @@
+{"query": "PKP/HR/2024/07", "expected_file": "circular_2024_07_remote_work.pdf", "user": "ben", "category": "exact"}
+{"query": "This circular supersedes PKP/HR/2024/07", "expected_file": "circular_2026_03_remote_work.docx", "user": "ben", "category": "exact"}
+{"query": "Quarterly Budget Q3 2026", "expected_file": "quarterly_budget_q3_2026.xlsx", "user": "alice", "category": "exact"}
+{"query": "Procurement Thresholds open tender", "expected_file": "policy_procurement.docx", "user": "alice", "category": "exact"}
+{"query": "connectivity allowance RM50 per month", "expected_file": "sop_claims_submission.pdf", "user": "chloe", "category": "exact"}
+{"query": "Annual Report on Digital Services 2025", "expected_file": "report_digital_services_2025_scanned.pdf", "user": "admin", "category": "exact"}
+{"query": "how many days can I work from home each week", "expected_file": "circular_2026_03_remote_work.docx", "user": "ben", "category": "paraphrase"}
+{"query": "how do I get reimbursed for travel expenses", "expected_file": "sop_claims_submission.pdf", "user": "alice", "category": "paraphrase"}
+{"query": "spending limit before a purchase needs three quotations", "expected_file": "policy_procurement.docx", "user": "alice", "category": "paraphrase"}
+{"query": "overtime spending exceeded allocation this quarter", "expected_file": "quarterly_budget_q3_2026.xlsx", "user": "chloe", "category": "paraphrase"}
+{"query": "uptime and security incidents of online services last year", "expected_file": "report_digital_services_2025_scanned.pdf", "user": "alice", "category": "paraphrase"}
+{"query": "customer satisfaction score for digital services", "expected_file": "report_digital_services_2025_scanned.pdf", "user": "ben", "category": "paraphrase"}
+{"query": "minit mesyuarat pengurusan Jun 2026", "expected_file": "minutes_mesyuarat_jun_2026.pdf", "user": "alice", "category": "malay"}
+{"query": "prestasi perbelanjaan suku kedua", "expected_file": "minutes_mesyuarat_jun_2026.pdf", "user": "ben", "category": "malay"}
+{"query": "bekerja dari rumah tiga hari seminggu", "expected_file": "minutes_mesyuarat_jun_2026.pdf", "user": "chloe", "category": "malay"}
+{"query": "数据共享指南", "expected_file": "guideline_data_sharing_zh.png", "user": "alice", "category": "chinese"}
+{"query": "个人数据保护 匿名化", "expected_file": "guideline_data_sharing_zh.png", "user": "ben", "category": "chinese"}
+{"query": "数据共享申请程序", "expected_file": "guideline_data_sharing_zh.png", "user": "admin", "category": "chinese"}
+{"query": "quartely bud", "expected_file": "quarterly_budget_q3_2026.xlsx", "user": "alice", "category": "typo"}
+{"query": "procurment polcy", "expected_file": "policy_procurement.docx", "user": "alice", "category": "typo"}
+{"query": "remote wrok circular", "expected_file": "circular_2026_03_remote_work.docx", "user": "ben", "category": "typo"}
+{"query": "claims submision procedure", "expected_file": "sop_claims_submission.pdf", "user": "chloe", "category": "typo"}
+{"query": "what is the current policy on remote work", "expected_file": "circular_2026_03_remote_work.docx", "user": "chloe", "category": "thematic"}
+{"query": "how does the agency ensure value for money and prevent splitting of purchases", "expected_file": "policy_procurement.docx", "user": "chloe", "category": "thematic"}
+{"query": "what are the department's digital priorities for 2026", "expected_file": "report_digital_services_2025_scanned.pdf", "user": "admin", "category": "thematic"}
+{"query": "information security rules for officers working at home", "expected_file": "circular_2026_03_remote_work.docx", "user": "ben", "category": "thematic"}
