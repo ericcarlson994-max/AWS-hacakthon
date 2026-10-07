@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-only-change-me"
     jwt_ttl_minutes: int = 720
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    cors_origin_regex: str = ""
 
     ocr_text_threshold: int = 50
     ocr_render_dpi: int = 200

@@ -1,6 +1,8 @@
-# GovDocs Search Backend
+# GovSearch — backend
 
-Document store for saving and retrieving government documents: upload, OCR-aware extraction, chunking, embeddings, enrichment (title, doctype, metadata, tags, supersedes), RAPTOR summaries, duplicate detection, versioning with merkle deltas, hybrid search, typo-tolerant suggest and cited answers over SSE, all filtered by the user's departments.
+**Team:** Marcus Yeo Kuok Huang · Eric Carlson Anak Herryson · See the [project README](../README.md) for the overview.
+
+FastAPI backend for saving and retrieving government documents: upload, OCR-aware extraction, chunking, embeddings, enrichment (title, doctype, metadata, tags, supersedes), RAPTOR summaries, duplicate detection, versioning with merkle deltas, hybrid search, typo-tolerant suggest and cited answers over SSE, all filtered by the user's departments.
 
 The demo corpus is synthetic, for the fictional agency **Jabatan Perkhidmatan Digital Negeri (JPDN)**. No real government content is used.
 
@@ -26,7 +28,7 @@ make eval
 | Target | What it does |
 |---|---|
 | `make up` | Starts Postgres 17 + pgvector (5432), OpenSearch 2.19 (9200) and SeaweedFS S3 (9000) |
-| `make migrate` | Applies `db/migrations/001_init.sql` |
+| `make migrate` | Applies `db/migrations/001_init.sql` and `002_folders.sql` (folders, soft delete) |
 | `make api` | FastAPI on http://localhost:8000 (docs at `/docs`, schema at `/openapi.json`) |
 | `make worker` | Background pipeline worker (extract, index, enrich, summarize, delta) |
 | `make corpus` | Generates the synthetic corpus into `samples/corpus/` |
@@ -52,6 +54,24 @@ Log in with `POST /auth/dev-login {"username": "alice"}` and send the returned t
 ## Ask: RAG and agent
 
 `POST /ask` with `"mode": "agent"` runs a Strands Agents tool-using agent (`packages/dms_agent`). Its tools are search, document metadata, version diff and list. Every tool runs under the caller's departments. The default `"mode": "rag"` is single-shot retrieval plus an answer. See `docs/api-contract.md`.
+
+## Search design
+
+- **Extraction:** per-page routing. Pages with a text layer are read directly; image-only pages go to the Qwen3-VL vision model for OCR (English, Malay, Chinese).
+- **Indexing:** structure-aware chunks are indexed twice in OpenSearch: a dense 1024-d BGE-M3 vector (HNSW, cosine similarity) and a sparse BM25 inverted index with a CJK analyser.
+- **Retrieval:** kNN and BM25 run in parallel with the same department filter and are merged with Reciprocal Rank Fusion, then collapsed per document with superseded documents ranked lower.
+- **Suggest:** a separate titles index with edge n-grams, trigrams and fuzzy matching for typo-tolerant suggestions.
+
+## Folders and CORS
+
+Documents live in an agency-wide folder tree (`GET/POST/PATCH/DELETE /folders`). New uploads land in Inbox and are auto-filed by document type after enrichment.
+
+For a frontend hosted elsewhere (for example Vercel), add its origin to `.env` and restart the API:
+
+```bash
+CORS_ORIGINS=http://localhost:3000,https://your-app.vercel.app
+CORS_ORIGIN_REGEX=https://.*\.vercel\.app
+```
 
 ## Secrets
 

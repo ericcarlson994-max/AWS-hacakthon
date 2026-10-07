@@ -1,5 +1,6 @@
 "use client";
 
+import { Markdown } from "./Markdown";
 import type { DocumentDetail, DocumentSummary } from "@/lib/types";
 import { documentRef, fmtDate, fmtSize, statusView, typeColors, typeLabel } from "@/lib/format";
 
@@ -81,9 +82,13 @@ export function DetailsPanel(props: Props) {
             Loading…
           </span>
         ) : (
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "var(--ink)" }}>
-            {detail?.root_summary || (status.busy ? "A summary will appear once indexing completes." : "No summary available.")}
-          </p>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: "var(--ink)" }}>
+            {detail?.root_summary ? (
+              <Markdown text={detail.root_summary} />
+            ) : (
+              <p style={{ margin: 0 }}>{status.busy ? "A summary will appear once indexing completes." : "No summary available."}</p>
+            )}
+          </div>
         )}
       </div>
 
